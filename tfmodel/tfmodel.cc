@@ -67,7 +67,7 @@ bool TfModel::Load(const std::string& path) {
     return false;
   }
   VLOG(0) << "Creating session.";
-  tensorflow::Status s = session_->Create(tensorflow_graph);
+  tensorflow::Status s = session_->Create(tensorflow_graph); // 获得session
   if (!s.ok()) {
     VLOG(0) << "Could not create Tensorflow Graph: " << s;
     return false;

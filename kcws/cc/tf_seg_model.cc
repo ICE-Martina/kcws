@@ -71,18 +71,18 @@ class KcwsScanReporter : public AcScanner<UnicodeStr, int>::ScanReporter {
   bool callback(uint32_t pos, int& weight, size_t len) override {
     if (len == 1) {
       emit_infos_[pos].needFake = true;
-      emit_infos_[pos].weights[0] += weight;
+      emit_infos_[pos].weights[0] += weight; // 'S'
     } else {
       for (size_t i = 0; i < len; i++) {
         uint32_t p = pos - len + 1 + i;
         emit_infos_[p].needFake = true;
         emit_infos_[p].totalWeight += weight;
         if (i == 0) {
-          emit_infos_[p].weights[1] += weight;
+          emit_infos_[p].weights[1] += weight; // 'B'
         } else if (i == (len - 1)) {
-          emit_infos_[p].weights[3] += weight;
+          emit_infos_[p].weights[3] += weight; // 'E'
         } else {
-          emit_infos_[p].weights[2] += weight;
+          emit_infos_[p].weights[2] += weight; // 'M'
         }
       }
     }
@@ -93,7 +93,7 @@ class KcwsScanReporter : public AcScanner<UnicodeStr, int>::ScanReporter {
                        Eigen::Aligned>& predictions,
       int sentenceIdx) {
     size_t slen = sentence_.size();
-    for (size_t i = 0; i < slen; i++) {
+    for (size_t i = 0; i < slen; i++) { // 每个词对应标签的权重
       if (emit_infos_[i].needFake) {
         predictions(sentenceIdx, i, 0) =
             log(emit_infos_[i].weights[0] / emit_infos_[i].totalWeight);
@@ -270,6 +270,7 @@ bool TfSegModel::LoadModel(const std::string& modelPath,
   return true;
 }
 
+// 切分一个batch的句子
 bool TfSegModel::Segment(const std::vector<UnicodeStr>& sentences,
                          std::vector<std::vector<SegTok>>* pTopResults) {
   if (sentences.empty()) {
@@ -287,6 +288,7 @@ bool TfSegModel::Segment(const std::vector<UnicodeStr>& sentences,
       {{FLAGS_INPUT_NODE_NAME, input_tensor}});
 
   size_t ns = sentences.size();
+  // 将词转换为相应的id
   for (size_t k = 0; k < ns; k++) {
     const UnicodeStr& word = sentences[k];
     int nn = word.size();
@@ -308,7 +310,7 @@ bool TfSegModel::Segment(const std::vector<UnicodeStr>& sentences,
         input_tensor_mapped(k, i) = it->second;
       }
     }
-    for (; i < max_sentence_len_; i++) {
+    for (; i < max_sentence_len_; i++) { // 长度不足的补全
       input_tensor_mapped(k, i) = 0;
     }
   }
@@ -316,6 +318,7 @@ bool TfSegModel::Segment(const std::vector<UnicodeStr>& sentences,
   std::vector<tensorflow::Tensor> output_tensors;
   std::vector<std::string> output_names({FLAGS_SCORES_NODE_NAME});
 
+  // 获取结果output_tensors
   if (!model_->Eval(input_tensors, output_names, output_tensors)) {
     LOG(ERROR) << "Error during inference: ";
     return false;
@@ -334,6 +337,7 @@ bool TfSegModel::Segment(const std::vector<UnicodeStr>& sentences,
     }
     size_t nn = word.size();
     std::vector<int> resultTags;
+    // 调用viterbi算法得到最佳路径
     get_best_path(predictions, k, nn, transitions_, bp_, scores_, resultTags,
                   num_tags_);
     CHECK_EQ(nn, resultTags.size()) << "num tag should equals setence len";

@@ -203,7 +203,7 @@ def test_evaluate(sess, unary_score, test_sequence_length, transMatrix, inp,
     print("Accuracy: %.3f%%" % accuracy)
     return accuracy
 
-
+# 读取训练数据，并将数据转换为特征和标签
 def inputs(path):
     whole = read_csv(FLAGS.batch_size, path)
     features = tf.transpose(tf.stack(whole[0:FLAGS.max_sentence_len]))
@@ -225,8 +225,8 @@ def main(unused_argv):
         model = Model(FLAGS.embedding_size, FLAGS.num_tags,
                       FLAGS.word2vec_path, FLAGS.num_hidden)
         print("train data path:", trainDataPath)
-        X, Y = inputs(trainDataPath)
-        tX, tY = do_load_data(tf.app.flags.FLAGS.test_data_path)
+        X, Y = inputs(trainDataPath) # 使用多线程的方式读取训练数据集
+        tX, tY = do_load_data(tf.app.flags.FLAGS.test_data_path) # 直接读取测试数据集
         total_loss = model.loss(X, Y)
         train_op = train(total_loss)
         test_unary_score, test_sequence_length = model.test_unary_score()

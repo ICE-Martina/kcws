@@ -31,6 +31,7 @@ DEFINE_string(user_dict_path, "", "user dict path");
 DEFINE_int32(max_setence_len, 80, "max sentence len");
 
 const int BATCH_SIZE = 2000;
+// 加载测试文件
 int load_test_file(const std::string& path,
                    std::vector<std::string>* pstrs) {
   FILE *fp = fopen(path.c_str(), "r");
@@ -58,37 +59,39 @@ int main(int argc, char *argv[]) {
   tensorflow::port::InitMain(argv[0], &argc, &argv);
   google::ParseCommandLineFlags(&argc, &argv, true);
   if (FLAGS_vocab_path.empty()) {
-    VLOG(0) << "basic bocab path is not set";
+    VLOG(0) << "basic vocab path is not set";
     return 1;
   }
   if (FLAGS_model_path.empty()) {
     VLOG(0) << " model path is not set";
     return 1;
   }
+
+  // 加载模型
   kcws::TfSegModel sm;
   CHECK(sm.LoadModel(FLAGS_model_path,
                      FLAGS_vocab_path,
                      FLAGS_max_setence_len,
                      FLAGS_user_dict_path))
       << "Load model error";
-  if (!FLAGS_test_sentence.empty()) {
+  if (!FLAGS_test_sentence.empty()) { //如果是句子，直接进行切分
     std::vector<std::string> results;
     CHECK(sm.Segment(FLAGS_test_sentence, &results)) << "segment error";
     VLOG(0) << "results is :";
     for (auto str : results) {
       VLOG(0) << str;
     }
-  } else if (!FLAGS_test_file.empty()) {
+  } else if (!FLAGS_test_file.empty()) { // 如果是测试文件，需要先将文件转换为句子再进行切分
     kcws::SentenceBreaker breaker(FLAGS_max_setence_len);
     std::vector<std::string> teststrs;
-    int ns = load_test_file(FLAGS_test_file, &teststrs);
-    std::string todo;
+    int ns = load_test_file(FLAGS_test_file, &teststrs); // 加载测试文件
+    std::string todo; // 合并为一个字符串
     for (int i = 0; i < ns; i++) {
       todo.append(teststrs[i]);
     }
     UnicodeStr utodo;
     BasicStringUtil::u8tou16(todo.c_str(), todo.size(), utodo);
-    std::vector<UnicodeStr> sentences;
+    std::vector<UnicodeStr> sentences; // 将字符串切分为句子
     breaker.breakSentences(utodo, &sentences);
 
     VLOG(0) << "loaded :" << FLAGS_test_file << " ,got " << ns << " lines,"
@@ -102,8 +105,8 @@ int main(int argc, char *argv[]) {
       if (end > static_cast<int>(sentences.size())) {
         end = sentences.size();
       }
-      std::vector<std::vector<kcws::SegTok>> results;
-      std::vector<UnicodeStr>  todoSentences(sentences.begin() + (BATCH_SIZE * i), sentences.begin() + end);
+      std::vector<std::vector<kcws::SegTok>> results; // 切分后的句子
+      std::vector<UnicodeStr>  todoSentences(sentences.begin() + (BATCH_SIZE * i), sentences.begin() + end); // 切分前的句子
       CHECK(sm.Segment(todoSentences, &results)) << "segment error";
     }
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>

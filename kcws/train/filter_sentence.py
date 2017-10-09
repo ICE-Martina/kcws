@@ -6,7 +6,7 @@
 import sys
 import random
 
-
+# 将数据集切分为训练集和测试集
 def main(argc, argv):
     if argc < 2:
         print("Usage:%s <input>" % (argv[0]))

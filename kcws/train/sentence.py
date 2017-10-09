@@ -12,7 +12,7 @@
 
 class Sentence:
     def __init__(self):
-        self.tokens = []
+        self.tokens = [] # 词集合
         self.chars = 0
 
     def addToken(self, t):
@@ -32,14 +32,14 @@ class Sentence:
         for t in self.tokens:
             if len(t) == 1:
                 x.append(vob.GetWordIndex(str(t[0].encode("utf8"))))
-                y.append(0)
+                y.append(0) # 'S'，表示单字为词
             else:
                 nn = len(t)
                 for i in range(nn):
                     x.append(vob.GetWordIndex(str(t[i].encode("utf8"))))
                     if i == 0:
-                        y.append(1)
+                        y.append(1) # 'B', 表示词的首字
                     elif i == (nn - 1):
-                        y.append(3)
+                        y.append(3) # 'E'，表示词的尾字
                     else:
-                        y.append(2)
+                        y.append(2) # 'M'，表示词的中间

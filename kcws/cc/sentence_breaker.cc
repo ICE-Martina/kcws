@@ -43,6 +43,7 @@ bool SentenceBreaker::is_break_mark(UnicodeCharT uch) {
 }
 SentenceBreaker::~SentenceBreaker() = default;
 
+// 将text切分为句子
 bool SentenceBreaker::breakSentences(const UnicodeStr& text,
                                      std::vector<UnicodeStr>* lines) {
   UnicodeCharT markChar = 0;
@@ -54,12 +55,12 @@ bool SentenceBreaker::breakSentences(const UnicodeStr& text,
   for (size_t i = 0; i < nn; i++) {
     if (is_inline_mark(text[i])) {
       if (markChar == text[i]) {
-        lines->push_back(text.substr(markPos, i - markPos + 1));
+        lines->push_back(text.substr(markPos, i - markPos + 1)); // 将InlineMarks包围的部分作为一个句子
         markPos = i + 1;
         markChar = 0;
       } else {
         if (markPos != i) {
-          lines->push_back(text.substr(markPos, i - markPos ));
+          lines->push_back(text.substr(markPos, i - markPos )); // 将InlineMarks之前的部分作为一个句子
           markPos = i;
         }
         markChar = inline_marks_[text[i]];
@@ -68,18 +69,18 @@ bool SentenceBreaker::breakSentences(const UnicodeStr& text,
       if (is_break_mark(text[i]) ||
           (i - markPos + 1) >= static_cast<size_t>(max_len_)) {
         // Oops, too long
-        lines->push_back(text.substr(markPos, i - markPos + 1));
+        lines->push_back(text.substr(markPos, i - markPos + 1)); // 如果长度大于max_len_，切断为一个句子
         markPos = i + 1;
       }
     } else  if ((i - markPos + 1) >= static_cast<size_t>(max_len_) ) {
       // Oops, too long
-      lines->push_back(text.substr(markPos, i - markPos + 1));
+      lines->push_back(text.substr(markPos, i - markPos + 1)); // 如果长度大于max_len_，切断为一个句子
       markPos = i + 1;
       markChar = 0;
     }
   }
   if (markPos < nn) {
-    lines->push_back(text.substr(markPos, nn - markPos));
+    lines->push_back(text.substr(markPos, nn - markPos)); // 将最后的部分作为一个句子
   }
   return true;
 }

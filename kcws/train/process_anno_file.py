@@ -24,7 +24,7 @@ def processToken(token, collect, out, end):
   ustr = unicode(token.decode('utf8'))
   for u in ustr:
     collect.append(u)
-  uline = u''
+  uline = u'' # 不带标签的文本，各个字符用空格分割
   if token == '。' or end:
     if len(collect) > maxLen:
       longLine += 1
@@ -37,15 +37,15 @@ def processToken(token, collect, out, end):
     out.write("%s\n" % (str(uline.encode('utf8'))))
     del collect[:]
 
-
+# 处理单行文本
 def processLine(line, out):
   line = line.strip()
   nn = len(line)
-  seeLeftB = False
+  seeLeftB = False 
   start = 0
-  collect = []
+  collect = [] # 句子中包含的字符
   try:
-    for i in range(nn):
+    for i in range(nn):  # 去掉中括号
       if line[i] == ' ':
         if not seeLeftB:
           token = line[start:i]
@@ -81,7 +81,7 @@ def processLine(line, out):
   except Exception as e:
     pass
 
-
+# 处理人民日报语料，去除中括号和词性，转换为空格分割的字符
 def main(argc, argv):
   global totalLine
   global longLine
@@ -106,4 +106,5 @@ def main(argc, argv):
 
 
 if __name__ == '__main__':
-  main(len(sys.argv), sys.argv)
+  # argv = ["", "/Users/endy/Downloads/2014", "out.txt"]
+  main(sys.argc, sys.argv)

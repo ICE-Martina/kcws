@@ -34,13 +34,13 @@ def processToken(token, sentence, out, end, vob):
         if sentence.chars > MAX_LEN:
             longLine += 1
         else:
-            x = []
-            y = []
+            x = [] # 保存char id
+            y = [] # 保存char的标签
             totalChars += sentence.chars
             sentence.generate_tr_line(x, y, vob)
             nn = len(x)
             assert (nn == len(y))
-            for j in range(nn, MAX_LEN):
+            for j in range(nn, MAX_LEN): # 若长度未达到MAX_LEN，补全句子
                 x.append(0)
                 y.append(0)
             line = ''
@@ -98,7 +98,7 @@ def processLine(line, out, vob):
     except Exception as e:
         pass
 
-
+# 生成训练和测试语料
 def main(argc, argv):
     global totalLine
     global longLine
