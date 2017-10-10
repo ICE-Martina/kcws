@@ -132,6 +132,7 @@ TfSegModel::~TfSegModel() {
   }
 }
 
+// 加载词典
 bool load_vocab(const std::string& path,
                 std::unordered_map<UnicodeCharT, int>* pVocab) {
   FILE* fp = fopen(path.c_str(), "r");
@@ -176,6 +177,8 @@ bool load_vocab(const std::string& path,
   fclose(fp);
   return true;
 }
+
+// 加载用户自定义词典
 bool TfSegModel::loadUserDict(const std::string& userDictPath) {
   FILE* fp = fopen(userDictPath.c_str(), "r");
   if (fp == NULL) {
@@ -192,8 +195,8 @@ bool TfSegModel::loadUserDict(const std::string& userDictPath) {
     if (nn <= 0) {
       continue;
     }
-    std::vector<std::string> terms;
-    BasicStringUtil::SplitString(line, nn, '\t', &terms);
+    std::vector<std::string> terms; // 词和词的权重
+    BasicStringUtil::SplitString(line, nn, '\t', &terms); 
     nn = terms.size();
     if (nn != 2) {
       VLOG(0) << "line len expected 2, but got:" << nn;
@@ -206,12 +209,12 @@ bool TfSegModel::loadUserDict(const std::string& userDictPath) {
     }
     UnicodeStr ustr;
     CHECK(BasicStringUtil::u8tou16(word.c_str(), word.size(), ustr));
-    int weight = atoi(terms[1].c_str());
-    scanner_.pushNode(ustr, weight);
+    int weight = atoi(terms[1].c_str()); // 词的权重
+    scanner_.pushNode(ustr, weight); // 词和词的权重添加到scanner_中
     tn += 1;
   }
   if (tn > 1) {
-    scanner_.buildFailNode();
+    scanner_.buildFailNode(); // 构建fail node
   }
   fclose(fp);
   return true;
@@ -251,7 +254,7 @@ bool TfSegModel::LoadModel(const std::string& modelPath,
       vec.push_back(prediction(j + i * num_tags_));
     }
   }
-  if (!load_vocab(vocabPath, &vocab_)) {
+  if (!load_vocab(vocabPath, &vocab_)) { // 加载词典
     return false;
   }
   num_words_ = vocab_.size();
@@ -264,7 +267,7 @@ bool TfSegModel::LoadModel(const std::string& modelPath,
     bp_[i] = new int[num_tags_];
   }
   if (!userDictPath.empty()) {
-    CHECK(loadUserDict(userDictPath))
+    CHECK(loadUserDict(userDictPath)) // 加载用户自定义词典
         << "load user dict error from path:" << userDictPath;
   }
   return true;
@@ -316,7 +319,7 @@ bool TfSegModel::Segment(const std::vector<UnicodeStr>& sentences,
   }
 
   std::vector<tensorflow::Tensor> output_tensors;
-  std::vector<std::string> output_names({FLAGS_SCORES_NODE_NAME});
+  std::vector<std::string> output_names({FLAGS_SCORES_NODE_NAME}); // Reshape_7
 
   // 获取结果output_tensors
   if (!model_->Eval(input_tensors, output_names, output_tensors)) {
@@ -333,7 +336,7 @@ bool TfSegModel::Segment(const std::vector<UnicodeStr>& sentences,
       // 启用用户自定义词典
       KcwsScanReporter report(word);
       scanner_.doScan(word, &report);
-      report.fakePredication(predictions, k);
+      report.fakePredication(predictions, k); // 调整权重
     }
     size_t nn = word.size();
     std::vector<int> resultTags;

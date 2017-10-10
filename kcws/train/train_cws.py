@@ -205,7 +205,7 @@ def test_evaluate(sess, unary_score, test_sequence_length, transMatrix, inp,
 
 # 读取训练数据，并将数据转换为特征和标签
 def inputs(path):
-    whole = read_csv(FLAGS.batch_size, path)
+    whole = read_csv(FLAGS.batch_size, path) 
     features = tf.transpose(tf.stack(whole[0:FLAGS.max_sentence_len]))
     label = tf.transpose(tf.stack(whole[FLAGS.max_sentence_len:]))
     return features, label

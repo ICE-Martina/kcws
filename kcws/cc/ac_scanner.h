@@ -62,7 +62,7 @@ class AcScanner {
     }
     T data_;
     bool is_leaf_;
-    unordered_map<uint16_t, TrieNode *> transimition_;
+    unordered_map<uint16_t, TrieNode *> transimition_; // 包含的子结点
     TrieNode *fail_node_;
     uint8_t len_;
   };
@@ -70,13 +70,13 @@ class AcScanner {
 };
 
 template <typename S, typename T>
-AcScanner<S, T>::AcScanner() {
+AcScanner<S, T>::AcScanner() { // 构造函数
   root_ = new TrieNode();
   root_->fail_node_ = root_;
   num_node_ = 1;
 }
 template <typename S, typename T>
-AcScanner<S, T>::~AcScanner() {
+AcScanner<S, T>::~AcScanner() { // 析构函数
   if (root_) {
     delete root_;
     root_ = NULL;
@@ -84,17 +84,17 @@ AcScanner<S, T>::~AcScanner() {
 }
 
 template <typename S, typename T>
-void AcScanner<S, T>::pushNode(const S &wstr, const T &data) {
+void AcScanner<S, T>::pushNode(const S &wstr, const T &data) { // 添加结点
   TrieNode *cur = root_;
   TrieNode *prev = NULL;
   uint32_t nn = wstr.length();
-  if (0 == nn) return;
+  if (0 == nn) return; // 词为空
   uint16_t wc = 0;
   for (size_t i = 0; i < nn; i++) {
     wc = static_cast<uint16_t>(wstr[i]);
     prev = cur;
     auto it = cur->transimition_.find(wc);
-    if (it == cur->transimition_.end()) {
+    if (it == cur->transimition_.end()) { // 创建一个叶节点
       TrieNode *newNode = new TrieNode;
       cur = newNode;
       prev->transimition_[wc] = cur;
@@ -104,7 +104,7 @@ void AcScanner<S, T>::pushNode(const S &wstr, const T &data) {
     }
   }
 
-  if (cur->is_leaf_) {
+  if (cur->is_leaf_) { // 添加了重复结点（即重复的字符串）
     // duplicated string;
     VLOG(0) << "duplicated string found!";
     return;
@@ -115,16 +115,16 @@ void AcScanner<S, T>::pushNode(const S &wstr, const T &data) {
   }
 }
 template <typename S, typename T>
-void AcScanner<S, T>::buildFailNode() {
+void AcScanner<S, T>::buildFailNode() { // 构建fail node
   queue<TrieNode *> todos;
   for (auto it = root_->transimition_.begin(); it != root_->transimition_.end();
        it++) {
     TrieNode *pNode = it->second;
-    pNode->fail_node_ = root_;
+    pNode->fail_node_ = root_; //第一层结点的fail node均为root节点
     todos.push(pNode);
   }
   while (!todos.empty()) {
-    TrieNode *parent = todos.front();
+    TrieNode *parent = todos.front(); // 从队首元素开始
     todos.pop();
     for (auto it = parent->transimition_.begin();
          it != parent->transimition_.end(); it++) {
@@ -140,10 +140,9 @@ void AcScanner<S, T>::buildFailNode() {
       if (it2 == parentFailNode->transimition_.end()) {
         cur->fail_node_ = root_;
       } else {
-        //        printf(" got fainode from parent,wc=%lc", wc);
         cur->fail_node_ = it->second;
       }
-      todos.push(cur);  // already processed cur
+      todos.push(cur);  // already processed cur， 添加到队列中
     }
   }
 }
@@ -188,7 +187,7 @@ bool AcScanner<S, T>::doScan(const S &word, ScanReporter *reporter) const {
       }
     }
     // 如果一直命中会匹配最长的词汇
-    if (cur->is_leaf_) {
+    if (cur->is_leaf_) { // 已经到了叶节点
       prevFound = cur;
       prevPos = i;
     }
