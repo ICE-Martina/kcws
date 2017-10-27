@@ -2,7 +2,7 @@
 
 ### 构建
 
-1. 安装好bazel代码构建工具，安装好tensorflow,依照tf-dist-build.md文件获得tf-dist
+1. 安装好bazel代码构建工具，安装好tensorflow，依照tf-dist-build.md文件介绍的步骤编译获得tf-dist
 2. 切换到本项目代码目录，运行./configure
 3. 编译后台服务 
 
@@ -66,7 +66,7 @@
 
 ### 词性标注的训练说明：
 
-https://github.com/koth/kcws/blob/master/pos_train.md
+https://github.com/endymecy/kcws/blob/master/pos_train.md
 
 ### 自定义词典
 目前支持自定义词典是在解码阶段，参考具体使用方式请参考kcws/cc/test_seg.cc
