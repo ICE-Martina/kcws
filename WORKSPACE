@@ -14,15 +14,12 @@ new_http_archive(
     sha256 = "7bcc5caace97baa948931d712ea5f37038dbb1c5d89b43ad4def4ed7cb683332",
 )
 
-
-new_http_archive(
+# you can see tf-dist-build.md to build tf-dist 
+new_local_repository(
    name="tf",
-   url = "https://gitlab.com/yovnchine/tfrelates/raw/master/tf_dist_1.2.0_rc1_0604.zip",
-   strip_prefix = "tf_dist/",
-   sha256 = "269115820a2ea4b7260f2ff131ed47860809e3ff05da763704a004724cea9775",
-   build_file="BUILD.tf_dist",
+   path = "tf-dist",
+   build_file="tf-dist/BUILD",
 )
-
 
 #new_local_repository(
 #   name="tf",
