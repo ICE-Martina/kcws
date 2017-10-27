@@ -7,7 +7,7 @@
 
 ### 构建
 
-1. 安装好bazel代码构建工具，安装好tensorflow（目前本项目需要tf 1.0.0alpha版本以上)
+1. 安装好bazel代码构建工具，安装好tensorflow,依照tf-dist-build.md文件获得tf-dist
 2. 切换到本项目代码目录，运行./configure
 3. 编译后台服务 
 
@@ -16,11 +16,8 @@
 
 ### 训练
 
-1. 关注待字闺中公众号 回复 kcws 获取语料下载地址：
-   
-   ![logo](https://github.com/koth/kcws/blob/master/docs/qrcode_dzgz.jpg?raw=true "待字闺中")
-   
-   
+1. 获取2014年的人民日报语料
+   
 2. 解压语料到一个目录
 
 3. 切换到代码目录，运行:
@@ -85,13 +82,6 @@ https://github.com/koth/kcws/blob/master/pos_train.md
 >蓝瘦香菇	4
 
 权重为一个正整数，一般4以上，越大越重要
- 
-### demo
-http://45.32.100.248:9090/
-
-附： 使用相同模型训练的公司名识别demo:
-
-http://45.32.100.248:18080
 
 
 
