@@ -1,9 +1,4 @@
-
-### 引用 
-
- 
-本项目模型BiLSTM+CRF参考论文：http://www.aclweb.org/anthology/N16-1030 ,IDCNN+CRF参考论文：https://arxiv.org/abs/1702.02098
-
+## 中文分词
 
 ### 构建
 
@@ -83,6 +78,8 @@ https://github.com/koth/kcws/blob/master/pos_train.md
 
 权重为一个正整数，一般4以上，越大越重要
 
+### 参考文献
 
+http://www.aclweb.org/anthology/N16-1030
 
-
+https://arxiv.org/abs/1702.02098
